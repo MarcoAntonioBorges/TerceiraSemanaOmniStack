@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import './style.css'
 
@@ -25,19 +26,32 @@ export default function Main({ match }) {
   }, [match.params.id]);
 
   async function handleLike(id) {
-    console.log('Like ' + id);
-    
+    await api.post(`/devs/${id}/likes`, null, {
+      headers: {
+        user: match.params.id,
+      }
+    });
+
+    setUsers(users.filter(user => user._id !== id));
   }
 
   async function handleDeslike(id){
-    console.log('Des ' + id);
-    
+    await api.post(`/devs/${id}/deslikes`, null, {
+      headers: {
+        user: match.params.id,
+      }
+    });
+
+    setUsers(users.filter(user => user._id !== id));
   }
 
   return (
     <div className="main-container">
-      <img src={logo} alt="Tindev"></img>
-      <ul>
+      <Link to="/">
+        <img src={logo} alt="Tindev"></img>
+      </Link>
+      {users.length > 0 ? (
+        <ul>
         {users.map(user => (
           <li key={user._id}>
             <img src={user.avatar} alt={user.name}></img>
@@ -56,6 +70,11 @@ export default function Main({ match }) {
           </li>
         ))}
       </ul>
+      ) : (
+        <div className="empty">
+          <p>Acabou :(</p>
+        </div>
+      )}
     </div>
   );
 }
